@@ -16,3 +16,4 @@ func CreateTableCredentials() {
 	services.GetInstanceDB().CreateTable(&Credentials{})
 	services.GetInstanceDB().Model(&Comment{}).AddForeignKey("user_id", "users(id)", "RESTRICT", "RESTRICT")
 }
+

@@ -2,7 +2,10 @@ package models
 
 import (
 	"app/services"
+	"encoding/json"
 	"fmt"
+	"github.com/ivahaev/go-logger"
+	"net/http"
 	"time"
 )
 
@@ -29,44 +32,44 @@ func CreateTableArticles() {
 	services.GetInstanceDB().Model(&Article{}).AddForeignKey("user_id", "users(id)", "RESTRICT", "RESTRICT")
 }
 
-func GetArticleByName(name string) *Article {
+func getArticleByName(name string) *Article {
 	var a Article
 	services.GetInstanceDB().Where("name = ?", name).First(&a)
 	return &a
 }
 
-func GetArticleById(articleId int) *Article {
+func getArticleById(articleId int) *Article {
 	var a Article
 	services.GetInstanceDB().Where("id = ?", articleId).First(&a)
 	return &a
 }
 
-func GetArticlesByDate(date time.Time) *[]Article {
+func getArticlesByDate(date time.Time) *[]Article {
 	var a []Article
 	services.GetInstanceDB().Where("created_td = ?", date).Find(&a)
 	return &a
 }
 
-func GetArticlesByUserNickname(nickname string) *[]Article {
+func getArticlesByUserNickname(nickname string) *[]Article {
 	var a []Article
 	services.GetInstanceDB().Raw("SELECT * from articles WHERE user_id in (select id from users where nickname = ?)", nickname).Scan(&a)
 	fmt.Println(a)
 	return &a
 }
 
-func GetArticlesByRating(rating int, duration string) *[]Article {
+func getArticlesByRating(rating int, duration string) *[]Article {
 	var a []Article
 	services.GetInstanceDB().Where(fmt.Sprintf("rating %s ?", duration), rating).Find(&a)
 	return &a
 }
 
-func GetArticles() *[]Article {
+func getArticlesFromDatabase() *[]Article {
 	var a []Article
 	services.GetInstanceDB().Limit(5).Find(&a)
 	return &a
 }
 
-func AddArticle(name, body, picturePath string, userId int) (int, error) {
+func saveArticlenDb(name, body, picturePath string, userId int) (int, error) {
 	a := &Article{
 		UserId:    userId,
 		Likes:     0,
@@ -91,7 +94,7 @@ func AddArticle(name, body, picturePath string, userId int) (int, error) {
 	return 500, tx.Commit().Error
 }
 
-func UpdateArticle(name, body, picturePath string, articleId int) error {
+func updateArticle(name, body, picturePath string, articleId int) error {
 	db := services.GetInstanceDB()
 	tx := db.Begin()
 	if tx.Error != nil {
@@ -104,7 +107,7 @@ func UpdateArticle(name, body, picturePath string, articleId int) error {
 	return tx.Commit().Error
 }
 
-func DeleteArticle(articleId int) error {
+func deleteArticle(articleId int) error {
 	a := &Article{Id: articleId}
 	db := services.GetInstanceDB()
 	tx := db.Begin()
@@ -118,11 +121,11 @@ func DeleteArticle(articleId int) error {
 	return tx.Commit().Error
 }
 
-func CalculateRating(name string) {
+func calculateRating(name string) {
 
 }
 
-func CalculateLikes(name string, like int) error {
+func calculateLikes(name string, like int) error {
 	db := services.GetInstanceDB().Begin()
 	var a Article
 	db.Where("name = ?", name).First(&a)
@@ -139,7 +142,7 @@ func CalculateLikes(name string, like int) error {
 	return tx.Commit().Error
 }
 
-func IncrimentViewCounts(name string) error {
+func incrimentViewCounts(name string) error {
 	db := services.GetInstanceDB().Begin()
 	var a Article
 	db.Where("name = ?", name).First(&a)
@@ -156,10 +159,36 @@ func IncrimentViewCounts(name string) error {
 	return tx.Commit().Error
 }
 
-func AddTags() {
+func addTags() {
 
 }
 
-func AddComment() {
+func addComment() {
 
 }
+
+
+
+//HTTP hadnlers
+var AddArticle = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+	var u User
+	err := r.ParseForm()
+	if err != nil {
+		w.Write([]byte(err.Error()))
+	}
+	//where get current user???
+	services.GetInstanceDB().Where("email = ?", "la-la-la").Find(&u)
+	picturePath := "testPath"
+	status, result := saveArticlenDb(r.Form.Get("name"), r.Form.Get("body"), picturePath, u.Id)
+	w.WriteHeader(status)
+	w.Write([]byte(result.Error()))
+})
+
+var GetArticles = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+	a := getArticlesFromDatabase()
+	b, err := json.Marshal(a)
+	if err != nil {
+		logger.Error(err)
+	}
+	w.Write([]byte(b))
+})

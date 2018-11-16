@@ -3,13 +3,14 @@ package auth
 import (
 	"app/models"
 	"app/services"
+	"net/http"
 	"time"
 )
 
 
 //THIS IS A NEW SHIT
 
-func RegisterUser(nickname, email, password, name string, birthday time.Time) (int, error) {
+func registerUser(nickname, email, password, name string, birthday time.Time) (int, error) {
 	var u models.User
 	var c models.Credentials
 	u.NickName = nickname
@@ -55,14 +56,16 @@ func RegisterUser(nickname, email, password, name string, birthday time.Time) (i
 	return 200, tx.Commit().Error
 }
 
-
-
-//Id        	int      	`gorm:"primary_key:true"`
-//BirthDate 	time.Time 	`gorm:"column:birthdate"`
-//CreatedAt 	time.Time	`gorm:"column:created_at`
-//Rating   	int 		`gorm:"column:rating"`
-//Name     	string 		`gorm:"column:name"`
-//NickName 	string 		`gorm:"column:nickname;not null;unique"`
-//Email    	string 		`gorm:"column:email;not null;unique"`
-//Avatar   	string 		`gorm:"column:avatar"`
-//Status   	string 		`gorm:"column:status"`
+//HTTP handler
+var Register = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+	var birthday time.Time
+	err := r.ParseForm()
+	if err != nil {
+		w.Write([]byte(err.Error()))
+	}
+	//Check form values
+	birthday, err = time.Parse("2006-01-02T15:04:05.000Z", r.Form.Get("birthday"))
+	status, result := registerUser(r.Form.Get("nickname"),r.Form.Get("email"), r.Form.Get("password"),r.Form.Get("name"), birthday)
+	w.WriteHeader(status)
+	w.Write([]byte(result.Error()))
+})
