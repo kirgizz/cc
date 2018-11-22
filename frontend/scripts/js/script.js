@@ -1,59 +1,50 @@
-function login(){
-
+function checkAuth() {
+  if (document.cookie.indexOf("ssid") == 0) {
+    var login = $('#login');
+    var register = $('#register');
+    login.text("logout");
+    login.attr('href','/api/logout');
+    register.text("Account");
+    register.attr('href','/addArticle.html');
+  } else {
+    console.log("there is no cookie ssid")
+  }
 }
 
-function logout() {
-
-}
-
-function getArticle() {
+function getArticles() {
   body = document.getElementById('body');
-/*  section = document.createElement('section');
-  section.setAttribute('class', 'common');
-
-  name = document.createElement('div');
-  name.setAttribute('class', 'name');
-
-  author = document.createElement('div');
-  author.setAttribute('class', 'author');
-
-  data = document.createElement('div');
-  data.setAttribute('class', 'data');
-
-  article = document.createElement('acrticle');
-  article.setAttribute('class', 'article');
-  body.appendChild(section);
-*/
-
   var request = new XMLHttpRequest();
  
   request.open('GET', 'api/getArticles', false);
 
   request.onload = function () {
     var data = JSON.parse(this.response); 
+    var la = "test text"
+    if (request.status >= 200 && request.status < 400) {
+//         $( "#body" ).append( "<p>i" + Test</p>" );
+      data.forEach(article => {
+        $("#body").append("<section class=\"article\"><div class=\"nickname\"><p>Author: " + article.UserId + "<p></div><div class=\"article_name\"><p>Article name: " + article.Name + "<p></div><article class=\"article_body\"><p>" + article.Body + "<p></article></section>")
 
-     if (request.status >= 200 && request.status < 400) {
-        data.forEach(article => {
-
-			  section = document.createElement('div');
-  			section.setAttribute('class', 'common');
-
-			  articleName = document.createElement('h1');
-        articleName.setAttribute('class', 'articleName');
-        articleName.textContent = article.Name;
-        
-			  author = document.createElement('h3');
-        author.setAttribute('class', 'author');
-        author.textContent = article.UserId;
-				
-				articleBody= document.createElement('article');
-        articleBody.setAttribute('class', 'article');
-        articleBody.textContent = article.Body;
-
-				body.appendChild(section)
-        section.appendChild(articleName);
-        section.appendChild(author);
-        section.appendChild(articleBody);
+//			  section = document.createElement('section');
+//  			section.setAttribute('class', 'article');
+//
+//        
+//			  articleName = document.createElement('h1');
+//        articleName.setAttribute('class', 'articleName');
+//        articleName.textContent = article.Name;
+//        
+//			  author = document.createElement('h3');
+//        author.setAttribute('class', 'author');
+//        author.textContent = article.UserId;
+//				
+//				articleBody= document.createElement('article');
+//        articleBody.setAttribute('class', 'article');
+//        articleBody.textContent = article.Body;
+//
+//				body.appendChild(section)
+//        section.appendChild(articleName);
+//        section.appendChild(author);
+//        section.appendChild(articleBody);
 
     }); 
 
@@ -63,58 +54,27 @@ function getArticle() {
     body.appendChild(errorMessage);
   }}
   request.send();
-
-
 }
-
-function addArticle() {
-
-}
-
-function updateArticle() {
-
-}
-
-
-
-function sendForm() {
-		console.log("data")
-/*    var http = new XMLHttpRequest();
-    http.open("POST", "api/login", true);
-    http.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-    var params = document.getElementById('loginForm');
-    http.send(params);
-    alert(http.responseText);
-*/
-/*
-    $.ajax({
-        type:'post',//тип запроса: get,post либо head
-        url:'api/login',//url адрес файла обработчика
-        data:data,//параметры запроса
-        processData: false,
-        contentType: false,
-        success:function(data){//возвращаемый результат от сервера
-					alert("Success")
-              },
-        error:function(){
-  				alert("Error")
-        }
-    });
-*/
-}
-
 
 function call(form, url) {
-  var msg   = $(form).serialize();
+  var f = $(form).serialize();
+  console.log(f)
     $.ajax({
       type: 'POST',
       url: url,
-      data: msg,
-      success: function(data) {
-      $('#results').html(data);
+      data: f,
+    success:  function(xhr, str){
+	    console.log("SUCCESS");
+	    console.log(xhr.status);
+	    console.log(xhr.responseText);
+      if (url == "api/login") {
+        window.location.replace("/index.html");
+      }
     },
     error:  function(xhr, str){
-	    alert('Возникла ошибка: ' + xhr.responseCode);
+	    console.log("ERROR");
+	    console.log(xhr.status);
+	    console.log(xhr.responseText);
     }
   });
 }

@@ -15,8 +15,8 @@ type User struct {
 	CreatedAt 	time.Time	`gorm:"column:created_at`
 	Rating   	int 		`gorm:"column:rating"`
 	Name     	string 		`gorm:"column:name"`
-	NickName 	string 		`gorm:"column:nickname;not null;unique"`
-	Email    	string 		`gorm:"column:email;not null;unique"`
+	NickName 	string 		`gorm:"column:nickname;not null;unique" sql:"DEFAULT:NULL"`
+	Email    	string 		`gorm:"column:email;not null;unique" sql:"DEFAULT:NULL"`
 	Avatar   	string 		`gorm:"column:avatar"`
 	Status   	string 		`gorm:"column:status"`
 }

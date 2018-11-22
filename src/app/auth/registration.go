@@ -3,69 +3,69 @@ package auth
 import (
 	"app/models"
 	"app/services"
-	"net/http"
-	"time"
+	"app/utils"
+	"github.com/ivahaev/go-logger"
 )
 
 
-//THIS IS A NEW SHIT
+//This registration is bad stuff. After commit new user is users create new transaction, witch is bad
+func RegisterUser(email, nickname, password string) (int, string) {
 
-func registerUser(nickname, email, password, name string, birthday time.Time) (int, error) {
+
 	var u models.User
 	var c models.Credentials
-	u.NickName = nickname
+
 	u.Email = email
-	u.Name = name
-	u.BirthDate = birthday
+	u.NickName = nickname
+
+	//change function to create password hash
+	passwordHash := utils.CreateHash(password)
 
 	db := services.GetInstanceDB()
+
 	tx := db.Begin()
 	if tx.Error != nil {
-		return 500, tx.Error
+		logger.Error(tx.Error)
+		return 500, tx.Error.Error()
 	}
 	if err := tx.Create(&u).Error; err != nil {
 		tx.Rollback()
-		return 500, err
+		logger.Error(err)
+		return 500, err.Error()
 	}
 
-	if tx.Commit().Error != nil {
+	if err := tx.Commit().Error; err != nil {
 		tx.Rollback()
-		return 500, tx.Commit().Error
+		logger.Error(err)
+		return 500, tx.Commit().Error.Error()
 	}
 
-	err := db.Where("nickname = ?", nickname).First(&u).Error
+	err := db.Where("email = ?", email).First(&u).Error
 	if err != nil {
-		return 500, err
+		logger.Error(err)
+		return 500, err.Error()
 	}
 
-	c.Password = password
+	//check password cerrtions
+	c.Password = passwordHash
 	c.UserId = u.Id
 
 	tx = db.Begin()
 	if tx.Error != nil {
-		return 500, tx.Error
+		logger.Error(err)
+		return 500, tx.Error.Error()
 	}
+	//rollback dont rollback transaction
 	if err := tx.Create(&c).Error; err != nil {
 		tx.Rollback()
-		return 500, err
+		logger.Error(err)
+		return 500, err.Error()
 	}
 	if tx.Commit().Error != nil {
+		logger.Error(err)
 		tx.Rollback()
-		return 500, tx.Commit().Error
+		return 500, tx.Commit().Error.Error()
 	}
-	return 200, tx.Commit().Error
+	//CREATE SSID hash for user
+	return 200, "User registered"
 }
-
-//HTTP handler
-var Register = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
-	var birthday time.Time
-	err := r.ParseForm()
-	if err != nil {
-		w.Write([]byte(err.Error()))
-	}
-	//Check form values
-	birthday, err = time.Parse("2006-01-02T15:04:05.000Z", r.Form.Get("birthday"))
-	status, result := registerUser(r.Form.Get("nickname"),r.Form.Get("email"), r.Form.Get("password"),r.Form.Get("name"), birthday)
-	w.WriteHeader(status)
-	w.Write([]byte(result.Error()))
-})

@@ -2,19 +2,17 @@ package models
 
 import (
 	"app/services"
-	"encoding/json"
 	"fmt"
 	"github.com/ivahaev/go-logger"
-	"net/http"
 	"time"
 )
 
 type Article struct {
 	Id         int       `gorm:"primary_key:true"`
 	UserId     int       `gorm:"column:user_id"`
-	Name       string    `gorm:"column:name;not null;unique"`
+	Name       string    `gorm:"column:name;not null;unique" sql:"DEFAULT:NULL"`
 	Body       string    `gorm:"column:body"`
-	Picture    string    `gorm:"column:picture;not null;unique"`
+	Picture    string    `gorm:"column:picture;unique" sql:"DEFAULT:NULL"`
 	CreatedAt  time.Time `gorm:"column:created_at"`
 	UptdatedAt time.Time `gorm:"column:update_at"`
 	Likes      int       `gorm:"column:likes"`
@@ -63,13 +61,13 @@ func getArticlesByRating(rating int, duration string) *[]Article {
 	return &a
 }
 
-func getArticlesFromDatabase() *[]Article {
+func GetArticlesFromDatabase() *[]Article {
 	var a []Article
 	services.GetInstanceDB().Limit(5).Find(&a)
 	return &a
 }
 
-func saveArticlenDb(name, body, picturePath string, userId int) (int, error) {
+func SaveArticlenDb(name, body string, userId int) (int, string) {
 	a := &Article{
 		UserId:    userId,
 		Likes:     0,
@@ -77,22 +75,30 @@ func saveArticlenDb(name, body, picturePath string, userId int) (int, error) {
 		ViewCount: 0,
 		Name:      name,
 		Body:      body,
-		CreatedAt: time.Now(),
-		Picture:   picturePath}
+		CreatedAt: time.Now()}
+
 	db := services.GetInstanceDB()
 	tx := db.Begin()
 	if tx.Error != nil {
-		return 500, tx.Error
+		logger.Error(tx.Error.Error())
+		return 500, tx.Error.Error()
 	}
 	if err := tx.Create(&a).Error; err != nil {
+		logger.Error(err.Error())
 		tx.Rollback()
-		return 500, err
+		logger.Error(err.Error())
+		return 500, err.Error()
 	}
-	if tx.Commit().Error != nil {
-		return 200, tx.Commit().Error
+	//IS IT CORRECT BEHAVIOR?
+	//if err := tx.Commit().Error; err == nil {
+	//	return 200, "Success"
+	//}
+	if err := tx.Commit().Error; err == nil {
+		return 200, "success"
 	}
-	return 500, tx.Commit().Error
+	return 500, tx.Commit().Error.Error()
 }
+
 
 func updateArticle(name, body, picturePath string, articleId int) error {
 	db := services.GetInstanceDB()
@@ -166,29 +172,3 @@ func addTags() {
 func addComment() {
 
 }
-
-
-
-//HTTP hadnlers
-var AddArticle = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
-	var u User
-	err := r.ParseForm()
-	if err != nil {
-		w.Write([]byte(err.Error()))
-	}
-	//where get current user???
-	services.GetInstanceDB().Where("email = ?", "la-la-la").Find(&u)
-	picturePath := "testPath"
-	status, result := saveArticlenDb(r.Form.Get("name"), r.Form.Get("body"), picturePath, u.Id)
-	w.WriteHeader(status)
-	w.Write([]byte(result.Error()))
-})
-
-var GetArticles = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
-	a := getArticlesFromDatabase()
-	b, err := json.Marshal(a)
-	if err != nil {
-		logger.Error(err)
-	}
-	w.Write([]byte(b))
-})

@@ -12,25 +12,25 @@
 <script type="text/javascript" src="scripts/js/jquery-1.8.3.min.js"></script>
 
 <header>
-    <ul id="header-menu">
+    <ul>
       <li><a href="login.html">login</a></li>
-      <li><a href="registration.html">register</a></li> 
-      <li><a href="addArticle.html">addArticle</a></li> 
+      <li><a href="registration.html">register</a></li>
+      <li><a href="addArticle.html">addArticle</a></li>
       <li><a href="getMyArticles.html">getArticle</a></li>
       <li><a href="check.html">check</a></li>
     </ul>
 </header>
 
 
-<form method="POST" id="loginForm" action="javascript:void(null);" onsubmit="call(this, 'api/login')">
+<form method="POST" id="loginForm" action="javascript:void(null);" onsubmit="call(this, 'api/check')">
   <legend>Test From</legend>
   <label for="email">Email:</label><input id="email" name="email" value="" type="text">
-  <label for="password">Password:</label><input id="password" name="password" value="" type="text">
+  <label for="password">Password:</label><input id="password" name="password" value="" type="password">
+  <label for"remember">Remember me</label><input type="checkbox" name="remember"/>
   <input value="Send" type="submit">
 </form>
 
 
 <footer>
-  <p>Footer</p>
 </footer>
 </html>

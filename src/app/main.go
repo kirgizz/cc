@@ -1,9 +1,7 @@
 package main
 
 import (
-	"app/auth"
 	"app/migrations"
-	"app/models"
 	"app/server"
 	"app/services"
 	"context"
@@ -33,17 +31,25 @@ func OpenIndexHtml() string {
 
 }
 
-const migrate = false
+const (
+	migrate = false
+	PORT = "8080"
+)
 
 //LOGGING???
 //ADD INTERFACES???
+//ADD SEARCHING ENGINE
+//ADD FOTOS IN RTICLE
+//ADD UP DOWN COMMENTS
+//CHECK TEXT UNIQUENESS
+//ADD EMAIL VALIDATION
 
 func main() {
 	if migrate == true {
 		migrations.CreateDBStruct()
 	}
 
-	srv := &http.Server{Addr: ":" + "localhost:8080", Handler: Routing()}
+	srv := &http.Server{Addr: ":" + PORT, Handler: Routing()}
 
 	stopChan := make(chan os.Signal)
 	signal.Notify(stopChan, os.Interrupt, os.Kill, syscall.SIGSTOP)
@@ -55,7 +61,7 @@ func main() {
 		}
 	}()
 
-	logger.Info("Server gracefully started at port 8080")
+	logger.Info("Server gracefully started")
 	<-stopChan // wait for SIGINT
 	logger.Info("Shutting down server...")
 
@@ -78,17 +84,19 @@ func Routing() http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
+	//hr.Map("api.domain.com", apiRouter())
 	//r.HandleFunc("/api/login", server.Login).Methods("POST")
 
 	r.Route("/api", func(r chi.Router) {
-		r.Post("/login", auth.Login)
-		r.With(auth.CheckSession).Post("/logout", auth.Logout)
-		r.Post("/register", auth.Register)
-		r.Get("/getArticles", models.GetArticles)
-		r.With(auth.CheckSession).Post("/addArticle", models.AddArticle) // GET /articles
-		r.With(auth.CheckSession).Post("/updateArticle", models.AddArticle)
-		r.Get("/api/findArticleByName", server.NotImplemented)
-		r.Get("/api/findArticle", server.NotImplemented)
+		r.Post("/login", server.Login)
+		r.Get("/login", server.NotImplemented)
+		r.With(server.CheckSession).Post("/logout", server.Logout)
+		r.Post("/register", server.Register)
+		r.Get("/getArticles", server.GetArticles)
+		r.With(server.CheckSession).Post("/addArticle", server.AddArticle) // GET /articles
+		r.With(server.CheckSession).Post("/updateArticle", server.AddArticle)
+		r.Get("/findArticleByName", server.NotImplemented)
+		r.Get("/findArticle", server.NotImplemented)
 
 	})
 	return r
