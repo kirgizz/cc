@@ -24,6 +24,7 @@ func RegisterUser(email, nickname, password string) (int, string) {
 	db := services.GetInstanceDB()
 
 	tx := db.Begin()
+
 	if tx.Error != nil {
 		logger.Error(tx.Error)
 		return 500, tx.Error.Error()
@@ -33,6 +34,7 @@ func RegisterUser(email, nickname, password string) (int, string) {
 		logger.Error(err)
 		return 500, err.Error()
 	}
+
 
 	if err := tx.Commit().Error; err != nil {
 		tx.Rollback()
@@ -53,16 +55,26 @@ func RegisterUser(email, nickname, password string) (int, string) {
 	tx = db.Begin()
 	if tx.Error != nil {
 		logger.Error(err)
+		if err := db.Where("email = ?", email).Delete(&u).Error; err != nil {
+			//send email notifications to admin
+		}
 		return 500, tx.Error.Error()
 	}
 	//rollback dont rollback transaction
 	if err := tx.Create(&c).Error; err != nil {
-		tx.Rollback()
 		logger.Error(err)
+
+		if err := db.Where("email = ?", email).Delete(&u).Error; err != nil {
+			//send email notifications to admin
+		}
+		tx.Rollback()
 		return 500, err.Error()
 	}
 	if tx.Commit().Error != nil {
 		logger.Error(err)
+		if err := db.Where("email = ?", email).Delete(&u).Error; err != nil {
+			//send email notifications to admin
+		}
 		tx.Rollback()
 		return 500, tx.Commit().Error.Error()
 	}

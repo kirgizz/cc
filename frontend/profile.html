@@ -14,20 +14,32 @@
 <header>
     <ul id="header-menu">
       <li><a href="login.html">login</a></li>
-      <li><a href="registration.html">register</a></li>
-      <li><a href="addArticle.html">addArticle</a></li>
+      <li><a href="registration.html">register</a></li> 
+      <li><a href="addArticle.html">addArticle</a></li> 
       <li><a href="getMyArticles.html">getArticle</a></li>
+      <li><a href="check.html">check</a></li>
     </ul>
 </header>
 
-<form method="POST" id="addArticle" action="javascript:void(null);" onsubmit="addArticle(this)">
-  <label for="name">Name::</label><input id="name" name="name" value="" type="text" maxlength="100" size="10">
-  <textarea rows="10" cols="45" name="body" id="article_text_area"></textarea></p> 
-  <input value="preview" type="button" onclick="checkArticle();">
+
+
+
+<div id="profileForms">
+
+<form method="POST" id="loginForm" action="javascript:void(null);" onsubmit="call(this, 'api/login')">
+  <legend>Test From</legend>
+  <label for="email">Email:</label><input id="email" name="email" value="" type="text">
+  <label for="password">Password:</label><input id="password" name="password" value="" type="text">
   <input value="Send" type="submit">
 </form>
 
 
+
+</div>
+
+
+
 <footer>
+  <p>Footer</p>
 </footer>
 </html>

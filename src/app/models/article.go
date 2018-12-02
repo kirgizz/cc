@@ -4,6 +4,9 @@ import (
 	"app/services"
 	"fmt"
 	"github.com/ivahaev/go-logger"
+	"strings"
+
+	//	"strings"
 	"time"
 )
 
@@ -30,13 +33,13 @@ func CreateTableArticles() {
 	services.GetInstanceDB().Model(&Article{}).AddForeignKey("user_id", "users(id)", "RESTRICT", "RESTRICT")
 }
 
-func getArticleByName(name string) *Article {
+func GetArticleByName(name string) *Article {
 	var a Article
 	services.GetInstanceDB().Where("name = ?", name).First(&a)
 	return &a
 }
 
-func getArticleById(articleId int) *Article {
+func GetArticleById(articleId int) *Article {
 	var a Article
 	services.GetInstanceDB().Where("id = ?", articleId).First(&a)
 	return &a
@@ -61,13 +64,29 @@ func getArticlesByRating(rating int, duration string) *[]Article {
 	return &a
 }
 
-func GetArticlesFromDatabase() *[]Article {
-	var a []Article
-	services.GetInstanceDB().Limit(5).Find(&a)
-	return &a
+func GetArticlesFromDatabase() interface{} {
+	//var g []Article
+	type article struct{
+		Id			int
+		Email 		string
+		Name 		string
+		Rating 		int
+		Body 		string
+		View_count 	int
+	}
+	var a []article
+	services.GetInstanceDB().Raw("select articles.id, users.email, articles.name, articles.rating, articles.body, articles.view_count from users, articles where users.id = articles.user_id").Scan(&a)
+	//services.GetInstanceDB().Limit(5).Find(&a)
+	for _, v := range a {
+
+		v.Body = strings.Split(v.Body, "<cut>")[0]
+	}
+	return a
+	//select users.email, articles.name, articles.rating, articles.body from users, articles where users.id = articles.user_id
 }
 
 func SaveArticlenDb(name, body string, userId int) (int, string) {
+	//check tag <cut> in article body
 	a := &Article{
 		UserId:    userId,
 		Likes:     0,
@@ -127,8 +146,31 @@ func deleteArticle(articleId int) error {
 	return tx.Commit().Error
 }
 
-func calculateRating(name string) {
+func CalculateRating(name string, rating int) (error, int) {
 
+	var a Article
+	db := services.GetInstanceDB()
+	tx := db.Begin()
+	if tx.Error != nil {
+		return tx.Error, -1
+	}
+	//db.Model(&user).Where("active = ?", true).Update("name", "hello")
+	if err := tx.Where("name = ?", name).First(&a).Error; err != nil {
+		logger.Error(err)
+		tx.Rollback()
+		return err, -1
+
+	}
+	a.Rating = a.Rating + rating
+	if a.Rating < 0 {
+		a.Rating = 0
+	}
+	if err := tx.Model(&a).Update("rating", a.Rating).Error; err != nil {
+		logger.Error(err)
+		tx.Rollback()
+		return err, -1
+	}
+	return tx.Commit().Error, a.Rating
 }
 
 func calculateLikes(name string, like int) error {

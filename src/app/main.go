@@ -91,10 +91,13 @@ func Routing() http.Handler {
 		r.Post("/login", server.Login)
 		r.Get("/login", server.NotImplemented)
 		r.With(server.CheckSession).Post("/logout", server.Logout)
+		r.With(server.CheckSession2).Get("/logout", server.Logout)
 		r.Post("/register", server.Register)
+		r.Get("/getArticle/{[0-9]+}", server.GetArticle)
 		r.Get("/getArticles", server.GetArticles)
 		r.With(server.CheckSession).Post("/addArticle", server.AddArticle) // GET /articles
 		r.With(server.CheckSession).Post("/updateArticle", server.AddArticle)
+		r.Post("/calculateRating", server.CalculateRating)
 		r.Get("/findArticleByName", server.NotImplemented)
 		r.Get("/findArticle", server.NotImplemented)
 
