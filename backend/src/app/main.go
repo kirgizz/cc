@@ -79,6 +79,7 @@ func main() {
 
 func Routing() http.Handler {
 	r := chi.NewRouter()
+
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
@@ -100,6 +101,8 @@ func Routing() http.Handler {
 		r.Post("/calculateRating", server.CalculateRating)
 		r.Get("/findArticleByName", server.NotImplemented)
 		r.Get("/findArticle", server.NotImplemented)
+		r.Get("/deleteArticle/{[0-9]+}", server.NotImplemented)
+
 
 	})
 	return r

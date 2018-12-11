@@ -190,7 +190,7 @@ var GetArticles = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
 	if err != nil {
 		logger.Error(err)
 	}
-
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Write([]byte(b))
 })
 
