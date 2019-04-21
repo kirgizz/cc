@@ -7,9 +7,9 @@ import { getArticlesSuccess } from '../actions/articles-actions';
  */
 
 export function getArticles() {
-  return axios.get('http://localhost:8080/api/getArticles')
+  return axios.get('http://c-c.ru/api/getArticles')
     .then(response => {
       store.dispatch(getArticlesSuccess(response.data));
-      return response;
+      //return response;
     });
 }

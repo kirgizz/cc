@@ -32,15 +32,50 @@ var NotImplemented = http.HandlerFunc(func(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		logger.Crit(err)
 	}
-	logger.Info(r.Form)
+	w.Header().Set("header_name", "header_value")
+	r.Header.Set("name", "value")
+
+	ssidCookie := http.Cookie{
+		Name:   SSID,
+		Value:  "ssid",
+		Domain: "localhost",
+		Path:   PATH,
+		MaxAge: 36000}
+	http.SetCookie(w, &ssidCookie)
+	w.Header().Set("header_name", "header_value")
+	r.Header.Set("name", "value")
+
+
+
 	w.Write([]byte("Hello from not implemented function"))
 })
 
+func setCORS(w http.ResponseWriter) {
+	//	cors := cors.New(cors.Options{
+	//		// AllowedOrigins: []string{"https://foo.com"}, // Use this to allow specific origin hosts
+	//		//http://localhost:8081/message/
+	//		//AllowedOrigins:   []string{"*"},
+	//		AllowedOrigins:   []string{"http://localhost:3005/"},
+	//		//AllowedOrigins:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+	//		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
+	//		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+	//		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+	//		ExposedHeaders:   []string{"Link"},
+	//		AllowCredentials: true,
+	//		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	//	})
+//Access-Control-Allow-Headers: Content-Type
+
+	w.Header().Set("Access-Control-Allow-Headers", "Accept, Authorization, Content-Type, X-CSRF-Token")
+	w.Header().Set("Access-Control-Allow-Methods", "GET POST, PUT, DELETE, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3005")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+
+}
 
 func CheckSession(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var c models.Credentials
-		logger.Info(r.Cookies())
 		ssid, err := r.Cookie(SSID)
 		if err != nil {
 			logger.Error(err)
@@ -67,6 +102,28 @@ func CheckSession2(next http.Handler) http.Handler {
 	})
 }
 
+var CheckSessionHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	setCORS(w)
+	var statusCode = 403
+	var ssid struct {
+		Ssid string    `json:"ssid"`
+	}
+
+	body := json.NewDecoder(r.Body)
+	err := body.Decode(&ssid)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	result := auth.TempCheckSession(ssid.Ssid)
+	if result {
+		statusCode = 200
+	}
+	logger.Info(statusCode)
+	w.WriteHeader(statusCode)
+	//w.Write([]byte("result"))
+})
+
 //next.ServeHTTP(w, r.WithContext(ctxGroup))
 
 //https://habr.com/post/323714/
@@ -75,6 +132,7 @@ func createSession(ssid string) {
 }
 
 var Login = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+	setCORS(w)
 	err := r.ParseForm()
 	if err != nil {
 		logger.Error(err)
@@ -100,11 +158,13 @@ var Login = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
 			Path:   PATH,
 			MaxAge: maxAge}
 		http.SetCookie(w, &ssidCookie)
-		http.Redirect(w,r,"http://c-c.ru", http.StatusMovedPermanently)
-	} else {
+
+
+		//http.Redirect(w,r,"http://c-c.ru", http.StatusMovedPermanently)
+		//return
+	}
 		w.WriteHeader(status)
 		w.Write([]byte(result))
-	}
 })
 
 
@@ -190,7 +250,7 @@ var GetArticles = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
 	if err != nil {
 		logger.Error(err)
 	}
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	setCORS(w)
 	w.Write([]byte(b))
 })
 

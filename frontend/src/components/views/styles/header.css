@@ -1,0 +1,52 @@
+.logo {
+    float:left;
+    padding-right: 20px;
+}
+
+.Logo-img {
+    height: 50px;
+    width: 50px;
+    background: url(../../../assets/icons/logo-starcraft-2.png) 100% 100% no-repeat;
+    border: 2px solid black;
+    display: block;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding-left: 180px;
+
+}
+
+.topnav {
+    margin-top: 50px;
+}
+
+.topnav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.topnav ul li {
+    float: left;
+    border-right:1px solid #bbb;
+}
+
+.topnav ul li a {
+    display: block;
+    color: #5C5C5C;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.topnav ul li a:hover:not(.active) {
+    color: #6699FF;
+}
+
+.active {
+    color: #6699FF;
+}
+
+.authMenu {
+    float: right;
+}

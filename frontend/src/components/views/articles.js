@@ -1,15 +1,27 @@
 import React from 'react';
-import { Link } from 'react-router';
+import './styles/acrticles.css';
+//import { animateScroll } from "react-scroll";
 
 // Using "Stateless Functional Components"
 export default function(props) {
   return (
     <section className="Articles">
+        <div className="info">
+            <p>I am cycle info block, a repeat alot</p>
+            <p>I am cycle info block, a repeat alot</p>
+            <p>I am cycle info block, a repeat alot</p>
+            <p>I am cycle info block, a repeat alot</p>
+            <p>I am cycle info block, a repeat alot</p>
+            <p>I am cycle info block, a repeat alot</p>
+            <p>I am cycle info block, a repeat alot</p>
+            <p>I am cycle info block, a repeat alot</p>
+        </div>
 
 
       {props.articles.map(article => {
              return (
               <div>
+                <div className="article">
                   <div className="articleName">
                     <h1>{article.Name}</h1>
                   </div>
@@ -21,6 +33,8 @@ export default function(props) {
                   <div className="articleBody">
                     <p>{article.Body}</p>
                   </div>
+                  <div className="hr"></div>
+                </div>
               </div>
               );
 
@@ -30,50 +44,3 @@ export default function(props) {
     </section>
   );
 }
-
-/**{props.articles.map(article => {
-       return (
-        <div>
-            <div className="articleName">
-              <h1>{article.Name}</h1>
-            </div>
-
-            <div className="authorName">
-              <h2>{article.Email}</h2>
-            </div>
-
-            <div className="articleBody">
-              <p>{article.Body}</p>
-            </div>
-        </div>
-        );
-
-  })} */
-
-
-//	type article struct{
-//		Id			int
-//		Email 		string
-//		Name 		string
-//		Rating 		int
-//		Body 		string
-//		View_count 	int
-//	}
-//      {props.articles.map(article => {
-//return (
-//    <div>
-//      <div className="articleName">
-//        <h1>{article.Name}</h1>
-//      </div>
-
-//      <div className="authorName">
-//        <h2>{article.Email}</h2>
-//      </div>
-
-//      <div className="articleBody">
-//        <p>{article.Body}</p>
-//      </div>
-//    </div>
-//);
-
-//})}

@@ -1,14 +1,15 @@
 import React from 'react';
-import { Link } from 'react-router';
 import Header from '../views/header'
 import Footer from '../views/footer'
+import HeaderContainer from '../containers/header-container';
+import FooterContainer from '../containers/footer-container';
 // Using "Stateless Functional Components"
 export default function(props) {
  	 return (
  	 	<div>
- 	 		<Header />
+ 	 		<HeaderContainer />
  	       		{props.children}
- 	 		<Footer />
+ 	 		<FooterContainer />
  	 	</div>
  	   );
 }

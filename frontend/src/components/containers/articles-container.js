@@ -8,12 +8,7 @@ const ArticleContainer = React.createClass({
 
   componentWillMount: function() {
     articleApi.getArticles();
-    //store.dispatch(loadSearchLayout('userss', 'User Results'));
   },
-
-  //componentDidMount: function() {
-  //  articleApi.getArticles()
-  //},
 
   render: function() {
     return (

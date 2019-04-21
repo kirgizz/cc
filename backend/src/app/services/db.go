@@ -15,6 +15,7 @@ var onceDB sync.Once
 var host string
 
 //"user:password@/dbname?charset=utf8&parseTime=True&loc=Local")
+//check db connect in main function
 
 func GetInstanceDB() *gorm.DB {
 	host = "host=localhost port=5432 user=culture_admin dbname=culture_city password=qweASD123"
