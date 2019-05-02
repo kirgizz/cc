@@ -29,3 +29,6 @@ func GetInstanceDB() *gorm.DB {
 	})
 	return instantiatedDB
 }
+
+
+

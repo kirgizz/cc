@@ -10,9 +10,9 @@ function Header(props) {
           <div className="logo">
               <div className="Logo-img"> </div>
           </div>
-          
+
       <ul id="header-menu">
-        <li><Link to='/home'>about</Link></li>
+        <li><Link to='/about'>about</Link></li>
         <li><Link to='/publications'>publications</Link></li>
         <li><Link to='/users'>users</Link></li>
         <li><Link to='/rubrics'>rubrics</Link></li>

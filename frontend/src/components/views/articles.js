@@ -5,17 +5,18 @@ import './styles/acrticles.css';
 // Using "Stateless Functional Components"
 export default function(props) {
   return (
-    <section className="Articles">
-        <div className="info">
-            <p>I am cycle info block, a repeat alot</p>
-            <p>I am cycle info block, a repeat alot</p>
-            <p>I am cycle info block, a repeat alot</p>
-            <p>I am cycle info block, a repeat alot</p>
-            <p>I am cycle info block, a repeat alot</p>
-            <p>I am cycle info block, a repeat alot</p>
-            <p>I am cycle info block, a repeat alot</p>
-            <p>I am cycle info block, a repeat alot</p>
-        </div>
+      <div>
+          <div className="info">
+              <p>I am cycle info block, a repeat alot</p>
+              <p>I am cycle info block, a repeat alot</p>
+              <p>I am cycle info block, a repeat alot</p>
+              <p>I am cycle info block, a repeat alot</p>
+              <p>I am cycle info block, a repeat alot</p>
+              <p>I am cycle info block, a repeat alot</p>
+              <p>I am cycle info block, a repeat alot</p>
+              <p>I am cycle info block, a repeat alot</p>
+          </div>
+    <section className="block">
 
 
       {props.articles.map(article => {
@@ -42,5 +43,6 @@ export default function(props) {
 
 
     </section>
+          </div>
   );
 }

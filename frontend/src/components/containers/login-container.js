@@ -46,11 +46,6 @@ class LoginContainer extends Component {
 
 
     handleSubmit = event => {
-        //Is is correct function name???
-        //checkCredentials({"email":this.state.email, "password": this.state.password}).then(
-        //    (result) => console.log('result', result)
-        //)
-        //event.preventDefault();
 
         checkCredentials({"email":this.state.email, "password": this.state.password}).then(
             function(result) {

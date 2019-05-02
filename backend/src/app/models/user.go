@@ -4,6 +4,7 @@ import (
 	//	"app/auth"
 	"app/services"
 	"github.com/ivahaev/go-logger"
+	"net/http"
 	"time"
 )
 
@@ -16,18 +17,24 @@ type User struct {
 	Rating   	int 		`gorm:"column:rating"`
 	Name     	string 		`gorm:"column:name"`
 	NickName 	string 		`gorm:"column:nickname;unique" sql:"DEFAULT:NULL"`
-	Email    	string 		`gorm:"column:email;not null;unique" sql:"DEFAULT:NULL"`
+	Email    	string 		`gorm:"column:email;not null;unique"`
 	Avatar   	string 		`gorm:"column:avatar"`
 	Status   	string 		`gorm:"column:status"`
+	About		string 		`gorm:"column:about"`
+	Password	string 		`gorm:"column:password;not null"`
 }
 
-func CreateTableAuthors() {
+func (m *Model)CreateTableUsers() {
 	services.GetInstanceDB().CreateTable(&User{})
 }
 
 
-//ADD rollaback if commit error??
-
+func (u User) RegisterUser() int{
+	statusCode := http.StatusOK
+	db := services.GetInstanceDB()
+	db.Create(&u)
+	return statusCode
+}
 
 func UpdateUser(name, nickname string) error {
 	db := services.GetInstanceDB()

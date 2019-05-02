@@ -16,13 +16,13 @@ type Comment struct {
 	UpdatedAt time.Time `gorm:"column:updated_at"`
 }
 
-func CreateTableComments() {
+func (m Model) CreateTableComments() {
 	services.GetInstanceDB().CreateTable(&Comment{})
 	services.GetInstanceDB().Model(&Comment{}).AddForeignKey("user_id", "users(id)", "RESTRICT", "RESTRICT")
 	services.GetInstanceDB().Model(&Comment{}).AddForeignKey("article_id", "articles(id)", "RESTRICT", "RESTRICT")
 }
 
-func CreateComment(article_id, user_id int, body string) error {
+func createComment(article_id, user_id int, body string) error {
 	a := &Comment{
 		UserId:    user_id,
 		ArticleId: article_id,
@@ -43,7 +43,7 @@ func CreateComment(article_id, user_id int, body string) error {
 	return tx.Commit().Error
 }
 
-func UpdateComment(commentId int, body string) error {
+func updateComment(commentId int, body string) error {
 	db := services.GetInstanceDB()
 	tx := db.Begin()
 	if tx.Error != nil {
@@ -57,7 +57,7 @@ func UpdateComment(commentId int, body string) error {
 
 }
 
-func CalculateLikes1(commentId, like int) error {
+func calculateLikes1(commentId, like int) error {
 	db := services.GetInstanceDB().Begin()
 	var c Comment
 	db.Where("id = ?", commentId).First(&c)
@@ -74,7 +74,7 @@ func CalculateLikes1(commentId, like int) error {
 	return tx.Commit().Error
 }
 
-func DeleteComment(commentId int) error {
+func deleteComment(commentId int) error {
 	db := services.GetInstanceDB()
 	tx := db.Begin()
 	if tx.Error != nil {

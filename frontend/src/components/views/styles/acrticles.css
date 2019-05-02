@@ -1,11 +1,6 @@
 @import url(https://fonts.googleapis.com/css?family=Arimo:400,400italic|Playfair+Display+SC:400,700&subset=latin,cyrillic);
 
 
-.Articles {
-    margin-top: 50px;
-}
-
-
 .article {
     margin-top: 40px;
     overflow: hidden;
@@ -24,6 +19,16 @@
     border-style: inset;
     border-width: 1px;
 }
+
+
+
+/* should be in assets */
+
+.block {
+    margin-top: 50px;
+    width: 80%;
+}
+
 
 .info {
     float:right;
