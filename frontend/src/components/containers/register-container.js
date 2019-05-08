@@ -3,6 +3,8 @@ import Register from '../views/register';
 import {connect} from "react-redux";
 import {registerUser} from "../../api/register-api";
 import router from "../../router";
+import AddContainer from "./add-container";
+
 
 class RegisterContainer extends Component {
     constructor(props) {
@@ -41,12 +43,9 @@ class RegisterContainer extends Component {
             registerUser({"email":this.state.email, "password": this.state.password}).then(
                 function(result) {
                     if (result.status === 200) {
-                        //this.loginSuccess = true
-                        //router.props.history.push("/")
                         console.log("user registered")
                     } else {
                         console.log(this)
-                        //this.showElement()
                     }
                 }.bind(this))
         } else {
@@ -56,18 +55,19 @@ class RegisterContainer extends Component {
         }
     }
     render() {
-        //console.log("render", this.props)
         return (
             <Register {...this}/>
         );
     }
 }
 
-const mapStateToProps = function(store) {
-    return {
-        profile: store.profileState.profile
-    };
-};
 
-export default connect(mapStateToProps)(RegisterContainer);
+export default RegisterContainer
+//const mapStateToProps = function(store) {
+//    return {
+//        profile: store.profileState.profile
+//    };
+//};
+
+//export default connect(mapStateToProps)(RegisterContainer);
 

@@ -1,4 +1,3 @@
-//import React, { Component } from "react";
 import React from "react";
 import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import "./styles/login.css";
@@ -6,7 +5,7 @@ import "./styles/login.css";
 function Register(props) {
     return (
     <div>
-        <div className="RegisterForm">
+        <div className="authForm">
             <form onSubmit={props.handleSubmit}>
                 <FormGroup controlId="email" bsSize="large">
                     <ControlLabel>Email</ControlLabel>

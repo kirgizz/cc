@@ -15,7 +15,15 @@ class FooterContainer extends Component {
         //console.log("render", this.props)
         return (
 
-            <div></div>
+            <div>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+
+
+            </div>
             //<Footer {...this}/>
         );
     }

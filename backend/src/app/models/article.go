@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-type article struct {
+type Publication struct {
 	Id         int       `gorm:"primary_key:true"`
 	UserId     int       `gorm:"column:user_id"`
 	Name       string    `gorm:"column:name;not null;unique" sql:"DEFAULT:NULL"`
@@ -20,6 +20,7 @@ type article struct {
 	Rating     int       `gorm:"column:rating"`
 	ViewCount  int       `gorm:"column:view_count"`
 	Tags       []*tags   `gorm:"many2many:article_tags;"`
+	Rubrics       []*Rubrics   `gorm:"many2many:article_rubrics;"`
 	//	Status			string 		`gorm:"column:status"`
 	//tags 			[]tags 		`gorm:"foreignkey:id"`
 	//Created
@@ -27,38 +28,52 @@ type article struct {
 	//Deleted
 }
 
-func (m *Model) CreateTableArticles() {
-	services.GetInstanceDB().CreateTable(&article{})
-	services.GetInstanceDB().Model(&article{}).AddForeignKey("user_id", "users(id)", "RESTRICT", "RESTRICT")
+func (m *Model) CreateTablePublications() {
+	services.GetInstanceDB().CreateTable(&Publication{})
+	services.GetInstanceDB().Model(&Publication{}).AddForeignKey("user_id", "users(id)", "RESTRICT", "RESTRICT")
 }
 
-func GetArticleByName(name string) *article {
-	var a article
+func (a *Publication) saveArticles(userid int, name, body string, ) (error){
+
+	return services.GetInstanceDB().Save(&a).Error
+}
+
+
+
+
+
+
+
+
+
+
+func GetArticleByName(name string) *Publication {
+	var a Publication
 	services.GetInstanceDB().Where("name = ?", name).First(&a)
 	return &a
 }
 
-func GetArticleById(articleId int) *article {
-	var a article
+func GetArticleById(articleId int) *Publication {
+	var a Publication
 	services.GetInstanceDB().Where("id = ?", articleId).First(&a)
 	return &a
 }
 
-func getArticlesByDate(date time.Time) *[]article {
-	var a []article
+func getArticlesByDate(date time.Time) *[]Publication {
+	var a []Publication
 	services.GetInstanceDB().Where("created_td = ?", date).Find(&a)
 	return &a
 }
 
-func getArticlesByUserNickname(nickname string) *[]article {
-	var a []article
+func getArticlesByUserNickname(nickname string) *[]Publication {
+	var a []Publication
 	services.GetInstanceDB().Raw("SELECT * from articles WHERE user_id in (select id from users where nickname = ?)", nickname).Scan(&a)
 	fmt.Println(a)
 	return &a
 }
 
-func getArticlesByRating(rating int, duration string) *[]article {
-	var a []article
+func getArticlesByRating(rating int, duration string) *[]Publication {
+	var a []Publication
 	services.GetInstanceDB().Where(fmt.Sprintf("rating %s ?", duration), rating).Find(&a)
 	return &a
 }
@@ -86,7 +101,7 @@ func GetArticlesFromDatabase() interface{} {
 
 func SaveArticlenDb(name, body string, userId int) (int, string) {
 	//check tag <cut> in article body
-	a := &article{
+	a := &Publication{
 		UserId:    userId,
 		Likes:     0,
 		Rating:    0,
@@ -107,10 +122,6 @@ func SaveArticlenDb(name, body string, userId int) (int, string) {
 		logger.Error(err.Error())
 		return 500, err.Error()
 	}
-	//IS IT CORRECT BEHAVIOR?
-	//if err := tx.Commit().Error; err == nil {
-	//	return 200, "Success"
-	//}
 	if err := tx.Commit().Error; err == nil {
 		return 200, "success"
 	}
@@ -123,7 +134,7 @@ func updateArticle(name, body, picturePath string, articleId int) error {
 	if tx.Error != nil {
 		return tx.Error
 	}
-	if err := tx.Model(&article{}).Where("id = ?", articleId).Update(map[string]interface{}{"name": name, "body": body, "picturePath": picturePath}).Error; err != nil {
+	if err := tx.Model(&Publication{}).Where("id = ?", articleId).Update(map[string]interface{}{"name": name, "body": body, "picturePath": picturePath}).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -131,7 +142,7 @@ func updateArticle(name, body, picturePath string, articleId int) error {
 }
 
 func deleteArticle(articleId int) error {
-	a := &article{Id: articleId}
+	a := &Publication{Id: articleId}
 	db := services.GetInstanceDB()
 	tx := db.Begin()
 	if tx.Error != nil {
@@ -146,7 +157,7 @@ func deleteArticle(articleId int) error {
 
 func CalculateRating(name string, rating int) (error, int) {
 
-	var a article
+	var a Publication
 	db := services.GetInstanceDB()
 	tx := db.Begin()
 	if tx.Error != nil {
@@ -173,7 +184,7 @@ func CalculateRating(name string, rating int) (error, int) {
 
 func calculateLikes(name string, like int) error {
 	db := services.GetInstanceDB().Begin()
-	var a article
+	var a Publication
 	db.Where("name = ?", name).First(&a)
 	a.Likes += like
 
@@ -190,7 +201,7 @@ func calculateLikes(name string, like int) error {
 
 func incrimentViewCounts(name string) error {
 	db := services.GetInstanceDB().Begin()
-	var a article
+	var a Publication
 	db.Where("name = ?", name).First(&a)
 	a.ViewCount += 1
 	tx := db.Begin()

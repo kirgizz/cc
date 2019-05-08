@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
-//import Home from '../home';
+import { Button } from "react-bootstrap";
 import './styles/header.css'
 
 function Header(props) {
@@ -13,7 +13,7 @@ function Header(props) {
 
       <ul id="header-menu">
         <li><Link to='/about'>about</Link></li>
-        <li><Link to='/publications'>publications</Link></li>
+        <li><Link to='/feedback'>feedback</Link></li>
         <li><Link to='/users'>users</Link></li>
         <li><Link to='/rubrics'>rubrics</Link></li>
         <li><Link to='/companies'>companies</Link></li>
@@ -26,7 +26,7 @@ function Header(props) {
                   props.state.isAuth ? (
                       <div>
                           <li id="logout"><Link to='/logout'>logout</Link></li>
-                          <li id="hello" > hello user</li>
+                          <li id="logout"><Link to='/add'>write</Link></li>
                       </div>
                       ) : (
                       <div>

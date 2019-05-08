@@ -1,7 +1,6 @@
 package main
 
 import (
-	"app/migrations"
 	"app/server"
 	"app/services"
 	"context"
@@ -26,7 +25,7 @@ func main() {
 
 	if migrate == true {
 		//migrations.CreateDBStruct()
-		migrations.UpdateDbStruct()
+		//migrations.UpdateDbStruct()
 	}
 
 	srv := &http.Server{Addr: ":" +s.Port, Handler: s.Routing()}

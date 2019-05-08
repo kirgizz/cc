@@ -11,10 +11,10 @@ type migrations struct {
 func CreateDBStruct() {
 	var m models.Model
 	m.CreateTableUsers()
-	m.CreateTableArticles()
-	m.CreateTableComments()
+	m.CreateTablePublications()
 	m.CreateTableCredentials()
 	m.CreateTableTags()
+	m.CreateTableRubrics()
 }
 
 

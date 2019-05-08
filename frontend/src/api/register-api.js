@@ -8,9 +8,9 @@ import {getProfileSuccess} from "../actions/user-actions";
 export function registerUser(credentials) {
     const options = {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: { 'Content-Type': 'application/json' },
         //why is qs??
-        data: qs.stringify(credentials),
+        data: JSON.stringify(credentials),
         url: 'http://c-c.ru/api/register',
         withCredentials: true
     };
@@ -24,3 +24,4 @@ export function registerUser(credentials) {
             return error;
         });
 }
+

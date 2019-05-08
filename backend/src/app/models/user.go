@@ -3,6 +3,7 @@ package models
 import (
 	//	"app/auth"
 	"app/services"
+	"app/utils"
 	"github.com/ivahaev/go-logger"
 	"net/http"
 	"time"
@@ -21,21 +22,40 @@ type User struct {
 	Avatar   	string 		`gorm:"column:avatar"`
 	Status   	string 		`gorm:"column:status"`
 	About		string 		`gorm:"column:about"`
-	Password	string 		`gorm:"column:password;not null"`
 }
 
 func (m *Model)CreateTableUsers() {
 	services.GetInstanceDB().CreateTable(&User{})
 }
 
+func (u *User) RegisterUser(email, nickname, password string) (int, error){
+	u.Email = email
+	u.NickName = nickname
+	var c Credentials
+	err := services.GetInstanceDB().Create(&u).Error
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	logger.Info(u)
+	c.UserId = u.Id
+	c.Password = utils.CreateHash(password)
+	c.Ssid = utils.RandString(16)
+	err = services.GetInstanceDB().Create(&c).Error
+	if err != nil {
+		//TODO processing db delete error???
+		services.GetInstanceDB().Delete(&u)
+		return http.StatusInternalServerError, err
+	}
 
-func (u User) RegisterUser() int{
-	statusCode := http.StatusOK
-	db := services.GetInstanceDB()
-	db.Create(&u)
-	return statusCode
+	return http.StatusOK, nil
 }
 
+func (u *User) GetUser(email string) (error) {
+	return services.GetInstanceDB().Where("email = ?", email).Find(&u).Error
+}
+
+
+//TRASH
 func UpdateUser(name, nickname string) error {
 	db := services.GetInstanceDB()
 	tx := db.Begin()

@@ -7,7 +7,7 @@ import profileReducer from './profile-reducer';
 // Combine Reducers
 var reducers = combineReducers({
     articleState: articleReducer,
-    profileState: profileReducer
+    profileState: profileReducer,
 });
 
 export default reducers;

@@ -1,8 +1,7 @@
 // Using "Stateless Functional Components"
 import React from 'react';
 
-const About = React.createClass({
-    render: function() {
+function About(props) {
         return (
             <div>
                 <div className="info">
@@ -53,5 +52,5 @@ const About = React.createClass({
             </div>
         );
     }
-});
+
 export default About;

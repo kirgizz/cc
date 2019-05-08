@@ -2,18 +2,19 @@ package server
 
 import (
 	"app/models"
-	"app/utils"
+	"encoding/json"
 	"github.com/ivahaev/go-logger"
+	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 const (
 	SSID = "ssid"
-	REMEMBER = "remember"
-	EMAIL = "email"
 	PASS = "password"
 	DOMAIN = "c-c.ru"
 	PATH = "/"
+	MAXAGE = 3600
 )
 
 type Server struct {
@@ -27,38 +28,10 @@ type Message struct {
 	Direction int 		`json:"direction"`
 }
 
-var NotImplemented = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+func (s Server) NotImplemented(w http.ResponseWriter, r *http.Request) {
 	logger.Info(r)
-	logger.Info(r.Cookies())
-	err := r.ParseForm()
-	if err != nil {
-		logger.Crit(err)
-	}
-	w.Header().Set("header_name", "header_value")
-	r.Header.Set("name", "value")
-
-	ssidCookie := http.Cookie{
-		Name:   SSID,
-		Value:  "ssid",
-		Domain: "localhost",
-		Path:   PATH,
-		MaxAge: 36000}
-	http.SetCookie(w, &ssidCookie)
-	w.Header().Set("header_name", "header_value")
-	r.Header.Set("name", "value")
-
-	w.Write([]byte("Hello from not implemented function"))
-})
-
-func (s Server) getPublications(w http.ResponseWriter, r *http.Request) {
-	//ctx := r.Context()
-
-	//if err != nil {
-	//	logger.Error(err)
-	//	http.Error(w, http.StatusText(422), 422)
-	//	return
-	//}
-	logger.Info("Get publications function")
+	w.WriteHeader(http.StatusNoContent)
+	w.Write([]byte("Not implemented"))
 }
 
 func (s Server) registerUser(w http.ResponseWriter, r *http.Request) {
@@ -69,9 +42,177 @@ func (s Server) registerUser(w http.ResponseWriter, r *http.Request) {
 		statusCode = http.StatusInternalServerError
 	}
 	var u models.User
-	u.Email = r.FormValue("email")
-	u.NickName = r.FormValue("nickname")
-	u.Password = utils.CreateHash(r.FormValue("password"))
-	statusCode = u.RegisterUser()
+	var data struct {
+		Email string    `json:"email"`
+		Nickname string `json:"nickaname"`
+		Password string `json:"password"`
+	}
+	b, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		logger.Error(err)
+	}
+	err = json.Unmarshal(b, &data)
+	if err != nil {
+		logger.Error(err)
+	}
+	statusCode,err = u.RegisterUser(data.Email, data.Nickname, data.Password)
 	w.WriteHeader(statusCode)
+}
+
+func (s Server) getPublications(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (s Server) getRubrics(w http.ResponseWriter, r *http.Request) {
+	//var r []models.Rubrics
+	statusCode := http.StatusOK
+	rubrics, err := models.GetRubrics()
+	if err != nil {
+		logger.Error(err)
+		statusCode = http.StatusInternalServerError
+	}
+
+	b, err := json.Marshal(rubrics)
+	if err != nil {
+		logger.Error(err)
+		statusCode = http.StatusInternalServerError
+	}
+	w.WriteHeader(statusCode)
+	w.Write([]byte(b))
+}
+
+func (s Server) savePublication(w http.ResponseWriter, r *http.Request) {
+	var c models.Credentials
+	//var p models.Publication
+
+	var publication struct {
+		Rubrics []struct {
+			Id int `json:"id"`
+			Name string `jon:"name"`
+		}
+		Tags []struct {
+			Label string `json:"label"`
+			Value string `json:"value"`
+		}
+		Title string `json:"title"`
+		Body string `json:"body"`
+	}
+	b, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		logger.Error(err)
+	}
+	err = json.Unmarshal(b, &publication)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	cookie, err := r.Cookie("ssid")
+	if err != nil {
+		logger.Error(err)
+	}
+	err = c.GetUser(cookie.Value)
+	if err != nil {
+		logger.Error(err)
+	}
+
+
+
+
+
+	logger.Info(publication)
+}
+
+func (s Server) login(w http.ResponseWriter, r *http.Request) {
+	statusCode := http.StatusInternalServerError
+	var cookie http.Cookie
+	var c models.Credentials
+	var data struct{
+		Email string       `json:"email"`
+		Password string    `json:"password"`
+	}
+	b, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		logger.Error(err)
+	}
+	err = json.Unmarshal(b, &data)
+	if err != nil {
+		logger.Error(err)
+	}
+	statusCode, err = c.CheckCredentials(data.Email, data.Password)
+
+	if statusCode == http.StatusOK {
+		cookie = http.Cookie{
+			Name:   SSID,
+			Value:  c.Ssid,
+			Domain: DOMAIN,
+			Path:   PATH,
+			MaxAge: MAXAGE}
+	}
+	http.SetCookie(w, &cookie)
+	w.WriteHeader(statusCode)
+}
+
+
+func (s Server) checkSession(w http.ResponseWriter, r *http.Request) {
+	statusCode := http.StatusForbidden
+	var c models.Credentials
+	var session struct {
+		Ssid string `json:"ssid"`
+	}
+
+	b, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		logger.Error(err)
+	}
+	err = json.Unmarshal(b, &session)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	if err := c.GetUser(session.Ssid); err != nil{
+		statusCode = http.StatusInternalServerError
+		logger.Error(err)
+	}
+	if c.UserId != 0 {
+		statusCode = http.StatusOK
+
+	}
+	w.WriteHeader(statusCode)
+}
+
+
+func (s Server) logout(w http.ResponseWriter, r *http.Request) {
+	var c models.Credentials
+	var cookie http.Cookie
+	var data struct {
+		Ssid string `json:"ssid"`
+	}
+
+	b, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		logger.Error(err)
+	}
+	err = json.Unmarshal(b, &data)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	c.GetUser(data.Ssid)
+	logger.Info(string(b))
+
+	cookie = http.Cookie{
+		Name:   SSID,
+		Value:  c.Ssid,
+		Domain: DOMAIN,
+		Path:   PATH,
+		MaxAge: 0,
+		Expires: time.Now(),
+	}
+	http.SetCookie(w, &cookie)
+	w.WriteHeader(http.StatusInternalServerError)
 }

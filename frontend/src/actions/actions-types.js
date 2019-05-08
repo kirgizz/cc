@@ -10,3 +10,6 @@ export const LOAD_SEARCH_LAYOUT = 'LOAD_SEARCH_LAYOUT';
 
 // User
 export const GET_PROFILE_SUCCESS = 'GET_PROFILE_SUCCESS';
+
+// Rubrics
+export const GET_RUBRICS_SUCCESS = 'GET_RUBRICS_SUCCESS';

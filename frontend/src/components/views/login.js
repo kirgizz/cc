@@ -6,7 +6,7 @@ import "./styles/login.css";
 function Login(props) {
     return (
     <div>
-        <div className="Login">
+        <div className="authForm">
             <form onSubmit={props.handleSubmit}>
                 <FormGroup controlId="email" bsSize="large">
                     <ControlLabel>Email</ControlLabel>
@@ -39,7 +39,7 @@ function Login(props) {
             {
                 props.state.elemIsVisible?
                     <div>
-                        la-la-la
+                        wrong credentials
                     </div>
                     :null
             }

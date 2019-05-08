@@ -23,16 +23,3 @@ func RandString(n int) string {
 	return string(b)
 }
 
-
-func CheckPasswordHash(password, hash string) bool {
-	return password == hash
-	//pass := CreateHash(password)
-	//if pass != hash {
-	//	return false
-	//}
-	//return true
-	//err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	//return err == nil
-}
-
-
