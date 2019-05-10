@@ -1,22 +1,24 @@
 import React from 'react';
 import { Link } from 'react-router';
-
-//import Home from '../home';
+import vk from '../../styles/icons/vk-icon-circle.png'
 
 
 function Footer(props) {
   return (
     <footer>
-    <div className="footer-nav">
-      <ul id="footer-menu">
-        <li><Link to='/'>Home</Link></li>
-        <li><Link to='/publications'>Home</Link></li>
-        <li><Link to='/users'>Home</Link></li>
-        <li><Link to='/rubrics'>Home</Link></li>
-        <li><Link to='/companies'>Home</Link></li>
-        <li><Link to='/sandbox'>Home</Link></li>
-      </ul>
-    </div>
+      <div className="footer">
+        <div className="navigation">
+          <div className="logo">
+            <div className="Logo-img"> </div>
+          </div>
+
+          <div className="copyright">
+            <p>© 2019 «Культурный город», по вопросам пишите по адресу spb-cc@gmail.com или через форму на сайте</p>
+          </div>
+            <div className="vk-icon"><Link to='/about'><img src={vk} alt="vk-icon" /></Link></div>
+
+        </div>
+      </div>
     </footer>
   )
 }

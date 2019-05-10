@@ -1,10 +1,6 @@
 import React from 'react';
-import Select from 'react-select'
 import CreatableSelect from 'react-select/lib/Creatable';
-
-import "./styles/add.css";
 import {Button, ControlLabel, FormControl, FormGroup} from "react-bootstrap";
-
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
@@ -14,8 +10,12 @@ const editorConfiguration = {
     toolbar: [ 'heading', '|', 'bold', 'italic', '|', 'undo', 'redo', ]
 };
 
+function handleChange( event ) {
+    console.log(event)
+}
 
-function feedback(props) {
+
+function Feedback(props) {
     return (
         <div>
             <div className="info">
@@ -27,50 +27,38 @@ function feedback(props) {
             </div>
             <div className="block">
 
-                <form onSubmit={props.handleSubmit}>
-
-                    <FormGroup controlId="rubrics">
-                        <div className="rubrics-select-form">
-                            <p>Add rubrics to you publication</p>
-                            <Select
-                                value={props.state.rubrics}
-                                onChange={props.handeChangeRubrics}
-                                options={props.state.selectOptions}
-                                isMulti={true}
-                            />
-                        </div>
-                    </FormGroup>
+                <form onSubmit={handleChange}>
 
                     <FormGroup controlId="title">
                         <div className="publication-title">
                             <ControlLabel>Title</ControlLabel>
                             <FormControl
                                 autoFocus
-                                value={props.state.title}
-                                onChange={props.handleChangeTitle}
+                                //value={props.state.title}
+                                onChange={handleChange}
                             />
 
                         </div>
                     </FormGroup>
 
+                    <FormGroup controlId="email">
+                        <div className="email">
+                            <ControlLabel>Email</ControlLabel>
+                            <FormControl
+                                autoFocus
+                                //value={props.state.title}
+                                onChange={handleChange}
+                            />
+
+                        </div>
+                    </FormGroup>
 
                     <FormGroup controlId="publicationBody">
                         <div className="publication-text-editor">
-                            <p>Body</p>
                             <CKEditor
                                 editor={ ClassicEditor }
-                                onChange={props.handleEditorChange}
+                                onChange={handleChange}
                                 config={editorConfiguration}
-                            />
-                        </div>
-                    </FormGroup>
-
-                    <FormGroup controlId="tags">
-                        <div className="tags-select-form">
-                            <p>Add tags</p>
-                            <CreatableSelect
-                                isMulti
-                                onChange={props.handleChangeTags}
                             />
                         </div>
                     </FormGroup>
@@ -82,7 +70,6 @@ function feedback(props) {
                         //disabled={!props.validateForm()}
                         background-color="#4CAF50"
                     >
-
                         Sent
                     </Button>
 
@@ -92,4 +79,4 @@ function feedback(props) {
     )
 }
 
-export default feedback()
+export default Feedback

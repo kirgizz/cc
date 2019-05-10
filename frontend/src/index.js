@@ -1,17 +1,31 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import store from './store';
-import router from './router';
-import './assets/base.css';
+import { Router, Route, browserHistory } from 'react-router';
+import MainLayout from './components/layouts/main-layout';
+import About from './components/views/about';
+import Feedback from './components/views/feedback';
+
+import './styles/base.css'
+import './styles/about.css'
+import './styles/header.css'
+import './styles/footer.css'
+import './styles/feedback.css'
+
 
 require('es6-promise').polyfill();
 
-// Provider is a top-level component that wrapps our entire application, including
-// the Router. We pass it a reference to the store so we can use react-redux's
-// connect() method for Component Containers.
+const Routes = () => (
 
-ReactDOM.render(
-  <Provider store={store}>{router}</Provider>,
-  document.getElementById('app')
+    <Router history={browserHistory}>
+        <Route component={MainLayout}>
+            <Route path="/" component={About} />
+            <Route path="/feedback" component={Feedback}/>
+            <Route path="/about" component={About}/>
+        </Route>
+    </Router>
 );
+
+
+ReactDOM.render((
+    <Routes />
+), document.getElementById('app'))

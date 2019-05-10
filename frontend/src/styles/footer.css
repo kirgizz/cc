@@ -1,0 +1,16 @@
+.footer {
+    padding-top: 100px;
+    padding-bottom: 100px;
+}
+
+.footer .copyright {
+    display: inline-block;
+    margin-left: 20px;
+}
+
+
+.footer .vk-icon {
+    margin-left: 50px;
+    display: inline-block;
+    position: absolute;
+}
