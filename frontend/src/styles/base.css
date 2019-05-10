@@ -18,6 +18,17 @@ body {
     background-color $page-bg */
 }
 
+* {
+    font-size: 100%;
+    font-family: 'ArimoRegular',sans-serif;
+    letter-spacing: 1px;
+}
+
+h1,h2,h3,h4,h5 {
+    font-family: 'reef', sans-serif;
+}
+
+
 ul {
     list-style-type: none;
     margin: 0;
