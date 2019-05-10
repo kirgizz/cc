@@ -1,5 +1,4 @@
 import React from 'react';
-import CreatableSelect from 'react-select/lib/Creatable';
 import {Button, ControlLabel, FormControl, FormGroup} from "react-bootstrap";
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
